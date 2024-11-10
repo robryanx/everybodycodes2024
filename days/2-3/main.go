@@ -9,14 +9,16 @@ import (
 )
 
 func main() {
-	rows, err := util.ReadStrings("2-3", false, "\n")
+	rowsIter, err := util.ReadStrings("2-3", false, "\n")
 	if err != nil {
 		panic(err)
 	}
 
-	grid := gridFromRows(rows[2:])
+	allRows := slices.Collect(rowsIter)
 
-	wordsStr := rows[0][strings.Index(rows[0], ":")+1:]
+	grid := gridFromRows(allRows[2:])
+
+	wordsStr := allRows[0][strings.Index(allRows[0], ":")+1:]
 
 	allIndexes := make(map[string]struct{})
 	for _, word := range strings.Split(wordsStr, ",") {

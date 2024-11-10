@@ -3,6 +3,7 @@ package util
 import (
 	"bytes"
 	"fmt"
+	"iter"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -26,28 +27,33 @@ func ReadBytes(dayPart string, isSample bool) ([]byte, error) {
 	return os.ReadFile(filename(dayPart, isSample))
 }
 
-func ReadStrings(dayPart string, isSample bool, delim string) ([]string, error) {
-	var vals []string
-
-	err := read(filename(dayPart, isSample), delim, func(b []byte) {
-		vals = append(vals, string(b))
-	})
+func ReadStrings(dayPart string, isSample bool, delim string) (iter.Seq[string], error) {
+	partIter, err := read(filename(dayPart, isSample), delim)
 	if err != nil {
 		return nil, err
 	}
 
-	return vals, nil
+	return func(yield func(string) bool) {
+		for part := range partIter {
+			partStr := string(part)
+			if !yield(partStr) {
+				return
+			}
+		}
+	}, nil
 }
 
-func read(file string, delim string, iterator Iterator) error {
+func read(file string, delim string) (iter.Seq[[]byte], error) {
 	b, err := os.ReadFile(file)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	for _, row := range bytes.Split(b, []byte(delim)) {
-		iterator(row)
-	}
-
-	return nil
+	return func(yield func([]byte) bool) {
+		for _, row := range bytes.Split(b, []byte(delim)) {
+			if !yield(row) {
+				return
+			}
+		}
+	}, nil
 }

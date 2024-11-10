@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"iter"
 	"strings"
 
 	"github.com/robryanx/everybodycodes2024/util"
@@ -13,10 +14,17 @@ func main() {
 		panic(err)
 	}
 
-	wordsStr := strs[0][strings.Index(strs[0], ":")+1:]
+	next, stop := iter.Pull(strs)
+	defer stop()
+
+	words, _ := next()
+	next() // skip empty line
+
+	wordsStr := words[strings.Index(words, ":")+1:]
 
 	count := 0
-	for _, str := range strs[2:] {
+	str, ok := next()
+	for ok {
 		allIndexes := make(map[int]struct{}, len(str))
 		for _, word := range strings.Split(wordsStr, ",") {
 			indexes := strIndexes(str, word)
@@ -31,6 +39,10 @@ func main() {
 		}
 
 		count += len(allIndexes)
+		str, ok = next()
+		if !ok {
+			break
+		}
 	}
 
 	fmt.Println(count)
