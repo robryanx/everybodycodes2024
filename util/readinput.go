@@ -1,15 +1,14 @@
 package util
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
-	"strconv"
-	"strings"
 )
 
-type Iterator = func(s string)
+type Iterator = func(s []byte)
 
 func filename(dayPart string, isSample bool) string {
 	folder := "inputs"
@@ -30,36 +29,8 @@ func ReadBytes(dayPart string, isSample bool) ([]byte, error) {
 func ReadStrings(dayPart string, isSample bool, delim string) ([]string, error) {
 	var vals []string
 
-	err := read(filename(dayPart, isSample), delim, func(s string) {
-		vals = append(vals, s)
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return vals, nil
-}
-
-func ReadInts(dayPart string, isSample bool, delim string) ([]int, error) {
-	var vals []int
-
-	err := read(filename(dayPart, isSample), delim, func(s string) {
-		i, _ := strconv.Atoi(s)
-		vals = append(vals, i)
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return vals, nil
-}
-
-func ReadFloats(dayPart string, isSample bool, delim string) ([]float64, error) {
-	var vals []float64
-
-	err := read(filename(dayPart, isSample), delim, func(s string) {
-		i, _ := strconv.ParseFloat(s, 64)
-		vals = append(vals, i)
+	err := read(filename(dayPart, isSample), delim, func(b []byte) {
+		vals = append(vals, string(b))
 	})
 	if err != nil {
 		return nil, err
@@ -69,12 +40,12 @@ func ReadFloats(dayPart string, isSample bool, delim string) ([]float64, error) 
 }
 
 func read(file string, delim string, iterator Iterator) error {
-	bytes, err := os.ReadFile(file)
+	b, err := os.ReadFile(file)
 	if err != nil {
 		return err
 	}
 
-	for _, row := range strings.Split(string(bytes), delim) {
+	for _, row := range bytes.Split(b, []byte(delim)) {
 		iterator(row)
 	}
 
