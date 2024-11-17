@@ -75,12 +75,6 @@ func gridFromRows(rows []string) [][]byte {
 	return grid
 }
 
-func printGrid(grid [][]byte) {
-	for y := 0; y < len(grid); y++ {
-		fmt.Printf("%s\n", string(grid[y]))
-	}
-}
-
 func reverse(s []byte) []byte {
 	out := make([]byte, 0, len(s))
 	for i := len(s) - 1; i >= 0; i-- {
