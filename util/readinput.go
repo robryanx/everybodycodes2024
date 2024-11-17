@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strconv"
 )
 
 type Iterator = func(s []byte)
@@ -37,6 +38,25 @@ func ReadStrings(dayPart string, isSample bool, delim string) (iter.Seq[string],
 		for part := range partIter {
 			partStr := string(part)
 			if !yield(partStr) {
+				return
+			}
+		}
+	}, nil
+}
+
+func ReadInts(dayPart string, isSample bool, delim string) (iter.Seq[int], error) {
+	partIter, err := read(filename(dayPart, isSample), delim)
+	if err != nil {
+		return nil, err
+	}
+
+	return func(yield func(int) bool) {
+		for part := range partIter {
+			partInt, err := strconv.Atoi(string(part))
+			if err != nil {
+				return
+			}
+			if !yield(partInt) {
 				return
 			}
 		}
