@@ -1,1 +1,1 @@
-Advent of code 2023 in Go
+Everybody codes 2024 in go

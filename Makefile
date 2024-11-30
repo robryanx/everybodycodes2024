@@ -1,11 +1,7 @@
-run:
-	./scripts/run.sh $(DAY)
-.PHONY: run
-
 buildall:
 	go build -o bin ./days/...
 .PHONY: buildall
 
-testall: buildall
+testall:
 	go test ./
 .PHONY: testall
