@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"slices"
 	"strconv"
 	"strings"
@@ -32,7 +33,7 @@ func main() {
 
 	var grid [][]int
 	for x := 0; x < len(gridRaw[0]); x++ {
-		col := make([]int, 0, len(gridRaw))
+		col := make([]int, 0, len(gridRaw)+1)
 		for y := 0; y < len(gridRaw); y++ {
 			col = append(col, gridRaw[y][x])
 		}
@@ -40,7 +41,7 @@ func main() {
 		grid = append(grid, col)
 	}
 
-	shoutedCount := make(map[string]int, 0)
+	shoutedCount := make(map[int]int, 0)
 	for x := 0; ; x++ {
 		current := x % len(grid)
 		next := (x + 1) % len(grid)
@@ -62,25 +63,25 @@ func main() {
 			grid[next] = slices.Insert(grid[next], pos+1, clapper)
 		}
 
-		var shouted string
-		for y := 0; y < len(grid); y++ {
-			shouted += strconv.Itoa(grid[y][0])
+		var shouted int
+		for y := len(grid) - 1; y >= 0; y-- {
+			shouted += int(math.Pow(10, float64(digits(shouted)))) * grid[y][0]
 		}
 
-		if _, ok := shoutedCount[shouted]; !ok {
-			shoutedCount[shouted] = 1
-		} else {
-			shoutedCount[shouted]++
-		}
-
+		shoutedCount[shouted] += 1
 		if shoutedCount[shouted] == 2024 {
-			value, err := strconv.Atoi(shouted)
-			if err != nil {
-				panic(err)
-			}
-
-			fmt.Println((x + 1) * value)
+			fmt.Println((x + 1) * shouted)
 			break
 		}
 	}
+}
+
+func digits(num int) int {
+	count := 0
+	for num > 0 {
+		num = num / 10
+		count++
+	}
+
+	return count
 }
