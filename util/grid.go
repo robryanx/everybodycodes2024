@@ -8,6 +8,12 @@ func PrintGrid(grid [][]byte) {
 	}
 }
 
+func PrintIntGrid(grid [][]int) {
+	for y := 0; y < len(grid); y++ {
+		fmt.Printf("%d\n", grid[y])
+	}
+}
+
 func CopyGrid(grid [][]byte, populate bool) [][]byte {
 	nextGrid := make([][]byte, len(grid))
 	for y := 0; y < len(grid); y++ {
