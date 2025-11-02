@@ -28,6 +28,15 @@ func CopyGrid(grid [][]byte, populate bool) [][]byte {
 	return nextGrid
 }
 
+func OffsetGridFromGrid(grid [][]byte, offsetY, offsetX int) [][]byte {
+	var offsetGrid [][]byte
+	for y := offsetY; y < offsetY+8; y++ {
+		offsetGrid = append(offsetGrid, grid[y][offsetX:offsetX+8])
+	}
+
+	return offsetGrid
+}
+
 func AdjacentMatch(grid [][]byte, y, x int, incDiagonal bool, cb func(char byte, y, x int) bool) {
 	if y-1 >= 0 {
 		earlyExit := cb(grid[y-1][x], y-1, x)
