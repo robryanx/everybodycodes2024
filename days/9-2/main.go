@@ -21,19 +21,28 @@ func main() {
 		path := 0
 		base := sparkball / stamps[0] * 9 / 10
 		sparkball -= base * stamps[0]
-		rec(stamps, sparkball, sparkball, path, &shortest, shortestCache)
+		rec(stamps, 0, sparkball, sparkball, path, &shortest, shortestCache)
 		total += shortest + base
 	}
 
 	fmt.Println(total)
 }
 
-func rec(stamps []int, startingSparkball, sparkball int, path int, shortest *int, shortestCache map[int]int) {
-	if len(stamps) == 0 || sparkball < 0 {
+func rec(stamps []int, stampOffset, startingSparkball, sparkball int, path int, shortest *int, shortestCache map[int]int) {
+	if stampOffset == len(stamps) || sparkball < 0 {
 		return
 	}
 
-	key := ((startingSparkball - sparkball) * 1000) + stamps[0]
+	// should we skip this branch as being definitely longer
+	if stampOffset > 0 {
+		for i := stampOffset - 1; i >= 0; i-- {
+			if stamps[i]%stamps[stampOffset] == 0 && sparkball-stamps[i] > 0 {
+				return
+			}
+		}
+	}
+
+	key := ((startingSparkball - sparkball) * 1000) + stamps[stampOffset]
 
 	if sparkball > 0 {
 		if shortestPath, ok := shortestCache[key]; ok {
@@ -47,8 +56,8 @@ func rec(stamps []int, startingSparkball, sparkball int, path int, shortest *int
 		if path+1 >= *shortest {
 			return
 		}
-		rec(stamps, startingSparkball, sparkball-stamps[0], path+1, shortest, shortestCache)
-		rec(stamps[1:], startingSparkball, sparkball, path, shortest, shortestCache)
+		rec(stamps, stampOffset, startingSparkball, sparkball-stamps[stampOffset], path+1, shortest, shortestCache)
+		rec(stamps, stampOffset+1, startingSparkball, sparkball, path, shortest, shortestCache)
 	} else if path < *shortest {
 		*shortest = path
 		shortestCache[key] = path

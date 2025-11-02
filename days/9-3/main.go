@@ -16,8 +16,6 @@ func main() {
 
 	shortestCache := make(map[int]int, 1024)
 
-	// TODO: Make this less painfully slow
-
 	total := 0
 	for sparkball := range rows {
 		smallest := sparkball
@@ -31,10 +29,9 @@ func main() {
 		for i := sparkballMin; i <= sparkballMax; i++ {
 			path := 0
 			shortest := i
-			iterations := 0
 			base := i/stamps[0] - 12
 			adj := i - base*stamps[0]
-			rec(stamps, adj, adj, path, &iterations, &shortest, shortestCache)
+			rec(stamps, 0, adj, adj, path, &shortest, shortestCache)
 			counts[i] = shortest + base
 		}
 
@@ -50,13 +47,21 @@ func main() {
 	fmt.Println(total)
 }
 
-func rec(stamps []int, startingSparkball, sparkball int, path int, iterations, shortest *int, shortestCache map[int]int) {
-	if len(stamps) == 0 || sparkball < 0 {
+func rec(stamps []int, stampOffset, startingSparkball, sparkball int, path int, shortest *int, shortestCache map[int]int) {
+	if stampOffset == len(stamps) || sparkball < 0 {
 		return
 	}
 
-	*iterations++
-	key := ((startingSparkball - sparkball) * 1000) + stamps[0]
+	// should we skip this branch as being definitely longer
+	if stampOffset > 0 {
+		for i := stampOffset - 1; i >= 0; i-- {
+			if stamps[i]%stamps[stampOffset] == 0 && sparkball-stamps[i] > 0 {
+				return
+			}
+		}
+	}
+
+	key := ((startingSparkball - sparkball) * 1000) + stamps[stampOffset]
 
 	if sparkball > 0 {
 		if shortestPath, ok := shortestCache[key]; ok {
@@ -70,8 +75,8 @@ func rec(stamps []int, startingSparkball, sparkball int, path int, iterations, s
 		if path+1 >= *shortest {
 			return
 		}
-		rec(stamps, startingSparkball, sparkball-stamps[0], path+1, iterations, shortest, shortestCache)
-		rec(stamps[1:], startingSparkball, sparkball, path, iterations, shortest, shortestCache)
+		rec(stamps, stampOffset, startingSparkball, sparkball-stamps[stampOffset], path+1, shortest, shortestCache)
+		rec(stamps, stampOffset+1, startingSparkball, sparkball, path, shortest, shortestCache)
 	} else if path < *shortest {
 		*shortest = path
 		shortestCache[key] = path
