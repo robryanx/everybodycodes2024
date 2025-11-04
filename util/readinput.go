@@ -8,20 +8,65 @@ import (
 	"path/filepath"
 	"runtime"
 	"strconv"
+	"strings"
 )
 
 type Iterator = func(s []byte)
 
 func filename(dayPart string, isSample bool) string {
-	folder := "inputs"
+	yearDir := detectYearDir()
+	folder := filepath.Join(yearDir, "inputs")
 	if isSample {
-		folder = "samples"
+		folder = filepath.Join(yearDir, "samples")
 	}
 
-	_, fileName, _, _ := runtime.Caller(0)
+	_, fileName, _, ok := runtime.Caller(0)
+	if !ok {
+		return filepath.Join(folder, fmt.Sprintf("%s.txt", dayPart))
+	}
 	prefixPath := filepath.Dir(fileName)
+	basePath := filepath.Join(prefixPath, "..", folder)
 
-	return fmt.Sprintf("%s/../%s/%s.txt", prefixPath, folder, dayPart)
+	if !isSample {
+		if _, err := os.Stat(basePath); os.IsNotExist(err) {
+			altFolder := filepath.Join(yearDir, "input")
+			altPath := filepath.Join(prefixPath, "..", altFolder)
+			if _, err := os.Stat(altPath); err == nil {
+				basePath = altPath
+			}
+		}
+	}
+
+	return filepath.Join(basePath, fmt.Sprintf("%s.txt", dayPart))
+}
+
+func detectYearDir() string {
+	const defaultYear = "2024"
+	for skip := 2; skip < 10; skip++ {
+		if _, fileName, _, ok := runtime.Caller(skip); ok {
+			if year := extractYear(fileName); year != "" {
+				return year
+			}
+		} else {
+			break
+		}
+	}
+	return defaultYear
+}
+
+func extractYear(path string) string {
+	parts := strings.Split(filepath.ToSlash(path), "/")
+	for i := len(parts) - 1; i >= 0; i-- {
+		if parts[i] == "days" && i > 0 {
+			candidate := parts[i-1]
+			if len(candidate) == 4 {
+				if _, err := strconv.Atoi(candidate); err == nil {
+					return candidate
+				}
+			}
+		}
+	}
+	return ""
 }
 
 func ReadBytes(dayPart string, isSample bool) ([]byte, error) {

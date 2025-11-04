@@ -4,7 +4,7 @@ This command-line helper automates the tedious steps for the Everybody Codes 202
 
 - fetch encrypted inputs, descriptions, and sample notes for one or more days,
 - decrypt them using the published `key1`, `key2`, `key3` values,
-- persist the decrypted strings under `inputs/<day>-<part>.txt` and `samples/<day>-<part>.txt`,
+- persist the decrypted strings under `<year>/inputs/<day>-<part>.txt` and `<year>/samples/<day>-<part>.txt`,
 - optionally run your local Go solutions and submit their answers back to the site.
 
 The binary lives in `cli/main.go` and is intended to be run via `go run ./cli [...]`.
@@ -17,7 +17,7 @@ The binary lives in `cli/main.go` and is intended to be run via `go run ./cli [.
    export EVERYBODY_CODES_COOKIE="your-cookie-value"
    ```
 
-2. The day/part solver programs are expected under `./days/<day>-<part>/main.go`. Each solver must print the final answer on stdout.
+2. The day/part solver programs are expected under `./<year>/days/<day>-<part>/main.go`. Each solver must print the final answer on stdout.
 
 3. Use a writable Go build cache if your environment is sandboxed (e.g. `GOCACHE=$(pwd)/.gocache`).
 
@@ -33,7 +33,8 @@ go run ./cli [flags]
 | ------------- | ------------------------------------------------------------------------------------------- | ------- |
 | `-day`        | Day number or inclusive range (e.g. `3`, `5-8`). Values must fall between 1 and 25.        | `1`     |
 | `-part`       | Part number or inclusive range (e.g. `2`, `1-3`). Values must be within 1–3.               | `1-3`   |
-| `-submit`     | When present, runs `go run ./days/<day>-<part>` to capture the answer, then POSTs it back. | `false` |
+| `-submit`     | When present, runs `go run ./<year>/days/<day>-<part>` to capture the answer, then POSTs it back. | `false` |
+| `-year`       | Event year to target (affects remote endpoints, local storage, and solver path).                 | `2024`  |
 
 ### Examples
 
@@ -59,8 +60,8 @@ If a submission fails with HTTP 409, the CLI prints `answer already submitted`
 
 ## Output Files
 
-- `inputs/<day>-<part>.txt` – decrypted puzzle input.
-- `samples/<day>-<part>.txt` – decrypted example notes (only written when found).
+- `<year>/inputs/<day>-<part>.txt` – decrypted puzzle input.
+- `<year>/samples/<day>-<part>.txt` – decrypted example notes (only written when found).
 
 Existing files are overwritten so reruns keep the latest data.
 

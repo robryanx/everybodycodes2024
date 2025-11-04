@@ -1,6 +1,6 @@
-module github.com/robryanx/everybodycodes2024
+module github.com/robryanx/everybodycodes
 
-go 1.23
+go 1.25
 
 require github.com/stretchr/testify v1.8.4
 

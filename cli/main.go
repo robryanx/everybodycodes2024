@@ -33,6 +33,7 @@ func main() {
 	partFlag := flag.String("part", "1-3", "Quest part number or inclusive range (e.g. 2 or 1-3)")
 	debugFlag := flag.Bool("debug", false, "Print puzzle input and description to stdout")
 	submitFlag := flag.Bool("submit", false, "Run local solver and submit answers")
+	yearFlag := flag.Int("year", 2024, "Quest year (e.g. 2024)")
 	flag.Parse()
 
 	days, err := parseSelection(*dayFlag, 1, 25) // hard cap at 25 days for safety
@@ -57,15 +58,21 @@ func main() {
 		panic(err)
 	}
 
+	if *yearFlag < 2014 { // Everybody Codes inaugural year safeguard
+		panic(fmt.Sprintf("unsupported year %d", *yearFlag))
+	}
+	year := *yearFlag
+	yearDir := strconv.Itoa(year)
+
 	for _, day := range days {
-		if err := processDay(day, user.Seed, loginKey, *submitFlag, *debugFlag, parts); err != nil {
+		if err := processDay(year, yearDir, day, user.Seed, loginKey, *submitFlag, *debugFlag, parts); err != nil {
 			panic(err)
 		}
 	}
 }
 
-func processDay(day, seed int, loginKey string, submit bool, debug bool, parts []int) error {
-	questURL := fmt.Sprintf("https://everybody.codes/api/event/2024/quest/%d", day)
+func processDay(year int, yearDir string, day, seed int, loginKey string, submit bool, debug bool, parts []int) error {
+	questURL := fmt.Sprintf("https://everybody.codes/api/event/%d/quest/%d", year, day)
 	body, err := fetchWithCookie(questURL, loginKey)
 	if err != nil {
 		return fmt.Errorf("fetch quest %d: %w", day, err)
@@ -76,7 +83,7 @@ func processDay(day, seed int, loginKey string, submit bool, debug bool, parts [
 		return fmt.Errorf("decode quest %d keys: %w", day, err)
 	}
 
-	puzzleURL := fmt.Sprintf("https://everybody-codes.b-cdn.net/assets/2024/%d/input/%d.json", day, seed)
+	puzzleURL := fmt.Sprintf("https://everybody-codes.b-cdn.net/assets/%d/%d/input/%d.json", year, day, seed)
 	body, err = fetchWithCookie(puzzleURL, loginKey)
 	if err != nil {
 		return fmt.Errorf("fetch puzzle %d: %w", day, err)
@@ -87,7 +94,7 @@ func processDay(day, seed int, loginKey string, submit bool, debug bool, parts [
 		return fmt.Errorf("decode puzzle %d: %w", day, err)
 	}
 
-	descriptionURL := fmt.Sprintf("https://everybody-codes.b-cdn.net/assets/2024/%d/description.json", day)
+	descriptionURL := fmt.Sprintf("https://everybody-codes.b-cdn.net/assets/%d/%d/description.json", year, day)
 	body, err = fetchWithCookie(descriptionURL, loginKey)
 	if err != nil {
 		return fmt.Errorf("fetch description %d: %w", day, err)
@@ -117,7 +124,7 @@ func processDay(day, seed int, loginKey string, submit bool, debug bool, parts [
 			fmt.Printf("Day %d part %d input: %s\n\n", day, part, input)
 		}
 
-		if err := writeTextFile("inputs", day, part, input); err != nil {
+		if err := writeTextFile(filepath.Join(yearDir, "inputs"), day, part, input); err != nil {
 			return err
 		}
 
@@ -138,13 +145,13 @@ func processDay(day, seed int, loginKey string, submit bool, debug bool, parts [
 			if debug {
 				fmt.Printf("Day %d part %d sample: %s\n\n", day, part, sample)
 			}
-			if err := writeTextFile("samples", day, part, sample); err != nil {
+			if err := writeTextFile(filepath.Join(yearDir, "samples"), day, part, sample); err != nil {
 				return err
 			}
 		}
 
 		if submit {
-			answer, err := runSolution(day, part)
+			answer, err := runSolution(yearDir, day, part)
 			if err != nil {
 				return err
 			}
@@ -218,7 +225,7 @@ func fetchWithCookie(url, key string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("User-Agent", "everybodycodes-cli/0.1 (+github.com/robryanx/everybodycodes2024)")
+	req.Header.Set("User-Agent", "everybodycodes-cli/0.1 (+github.com/robryanx/everybodycodes)")
 	req.AddCookie(&http.Cookie{Name: "everybody-codes", Value: key, Path: "/"})
 
 	resp, err := http.DefaultClient.Do(req)
@@ -302,8 +309,8 @@ func parseSelection(value string, min, max int) ([]int, error) {
 	return []int{n}, nil
 }
 
-func runSolution(day, part int) (string, error) {
-	target := fmt.Sprintf("./days/%d-%d", day, part)
+func runSolution(yearDir string, day, part int) (string, error) {
+	target := fmt.Sprintf("./%s/days/%d-%d", yearDir, day, part)
 	cmd := exec.Command("go", "run", target)
 	cmd.Env = os.Environ()
 	output, err := cmd.CombinedOutput()
@@ -347,7 +354,7 @@ func submitAnswer(day, part int, answer, loginKey string) (*submitResponse, erro
 	if err != nil {
 		return nil, fmt.Errorf("build answer request: %w", err)
 	}
-	req.Header.Set("User-Agent", "everybodycodes-cli/0.1 (+github.com/robryanx/everybodycodes2024)")
+	req.Header.Set("User-Agent", "everybodycodes-cli/0.1 (+github.com/robryanx/everybodycodes)")
 	req.Header.Set("Content-Type", "application/json")
 	req.AddCookie(&http.Cookie{Name: "everybody-codes", Value: loginKey, Path: "/"})
 
