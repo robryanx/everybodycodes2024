@@ -1,0 +1,3 @@
+Ulmargarath,Karthgalor,Ralzeth,Lazireldrith,Malithjorath,Oryaxar,Tyroris,Ulkulrix,Zynjoris,Orongoril,Valsyron,Urnarel,Oryxar,Fyrardith,Pylarvynar,Rythrovan,Rynzris,Mornendris,Jarkynar,Thyrosthar
+
+L9,R14,L12,R8,L11,R14,L19,R14,L16,R13,L5,R18,L5,R14,L5,R12,L5,R15,L5,R9,L5,R9,L6,R8,L8,R11,L10,R5,L10

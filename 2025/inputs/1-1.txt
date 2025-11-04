@@ -1,0 +1,3 @@
+Eraskris,Lorther,Ferral,Dorelor,Oryfal,Jarnarel,Urakasis,Azmarnix,Thalxal,Agnarilor
+
+L6,R9,L1,R2,L1,R9,L1,R5,L1,R5,L8

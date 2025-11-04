@@ -1,1 +1,1 @@
-Everybody codes 2024 in go
+Everybody codes in go

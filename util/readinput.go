@@ -27,16 +27,6 @@ func filename(dayPart string, isSample bool) string {
 	prefixPath := filepath.Dir(fileName)
 	basePath := filepath.Join(prefixPath, "..", folder)
 
-	if !isSample {
-		if _, err := os.Stat(basePath); os.IsNotExist(err) {
-			altFolder := filepath.Join(yearDir, "input")
-			altPath := filepath.Join(prefixPath, "..", altFolder)
-			if _, err := os.Stat(altPath); err == nil {
-				basePath = altPath
-			}
-		}
-	}
-
 	return filepath.Join(basePath, fmt.Sprintf("%s.txt", dayPart))
 }
 
