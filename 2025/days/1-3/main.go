@@ -16,8 +16,8 @@ func main() {
 	}
 
 	lines := slices.Collect(rows)
-	names := strings.Split(string(lines[0]), ",")
-	for instruction := range strings.SplitSeq(string(lines[2]), ",") {
+	names := strings.Split(lines[0], ",")
+	for instruction := range strings.SplitSeq(lines[2], ",") {
 		pos := 0
 		count, err := strconv.Atoi(instruction[1:])
 		if err != nil {

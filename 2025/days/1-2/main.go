@@ -16,10 +16,10 @@ func main() {
 	}
 
 	lines := slices.Collect(rows)
-	names := strings.Split(string(lines[0]), ",")
+	names := strings.Split(lines[0], ",")
 
 	pos := 0
-	for instruction := range strings.SplitSeq(string(lines[2]), ",") {
+	for instruction := range strings.SplitSeq(lines[2], ",") {
 		count, err := strconv.Atoi(instruction[1:])
 		if err != nil {
 			panic(err)
