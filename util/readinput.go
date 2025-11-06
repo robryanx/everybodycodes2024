@@ -79,6 +79,30 @@ func ReadStrings(dayPart string, isSample bool, delim string) (iter.Seq[string],
 	}, nil
 }
 
+func ReadIntLists(dayPart string, isSample bool, delim string) (iter.Seq[[]int], error) {
+	partIter, err := read(filename(dayPart, isSample), delim)
+	if err != nil {
+		return nil, err
+	}
+
+	return func(yield func([]int) bool) {
+		for part := range partIter {
+			var list []int
+			for number := range strings.SplitSeq(string(part), ",") {
+				partInt, err := strconv.Atoi(number)
+				if err != nil {
+					return
+				}
+				list = append(list, partInt)
+			}
+
+			if !yield(list) {
+				return
+			}
+		}
+	}, nil
+}
+
 func ReadInts(dayPart string, isSample bool, delim string) (iter.Seq[int], error) {
 	partIter, err := read(filename(dayPart, isSample), delim)
 	if err != nil {
