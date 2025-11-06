@@ -1,0 +1,14 @@
+package main
+
+import (
+	"github.com/robryanx/everybodycodes/util"
+)
+
+func main() {
+	rows, err := util.ReadStrings("{{.Day}}-{{.Part}}", true, "\n")
+	if err != nil {
+		panic(err)
+	}
+
+	_ = rows
+}

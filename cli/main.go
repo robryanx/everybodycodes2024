@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
+	"embed"
 	"encoding/hex"
 	"encoding/json"
 	"flag"
@@ -17,10 +18,19 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"text/template"
 )
+
+//go:embed template.go.tmpl
+var templateFS embed.FS
 
 type User struct {
 	Seed int `json:"seed"`
+}
+
+type TemplateData struct {
+	Day  int
+	Part int
 }
 
 func main() {
@@ -33,7 +43,7 @@ func main() {
 	partFlag := flag.String("part", "1-3", "Quest part number or inclusive range (e.g. 2 or 1-3)")
 	debugFlag := flag.Bool("debug", false, "Print puzzle input and description to stdout")
 	submitFlag := flag.Bool("submit", false, "Run local solver and submit answers")
-	yearFlag := flag.Int("year", 2024, "Quest year (e.g. 2024)")
+	yearFlag := flag.Int("year", 2025, "Quest year (e.g. 2025)")
 	flag.Parse()
 
 	days, err := parseSelection(*dayFlag, 1, 25) // hard cap at 25 days for safety
@@ -72,6 +82,13 @@ func main() {
 }
 
 func processDay(year int, yearDir string, day, seed int, loginKey string, submit bool, debug bool, parts []int) error {
+	// Create directory structure and template files for each part if they don't exist
+	for _, part := range parts {
+		if err := ensureDayTemplate(yearDir, day, part, debug); err != nil {
+			return err
+		}
+	}
+
 	questURL := fmt.Sprintf("https://everybody.codes/api/event/%d/quest/%d", year, day)
 	body, err := fetchWithCookie(questURL, loginKey)
 	if err != nil {
@@ -268,6 +285,65 @@ func writeTextFile(dir string, day, part int, content string) error {
 	filename := fmt.Sprintf("%d-%d.txt", day, part)
 	path := filepath.Join(dir, filename)
 	return os.WriteFile(path, []byte(content), 0o644)
+}
+
+func ensureDayTemplate(yearDir string, day, part int, debug bool) error {
+	dayDir := filepath.Join(yearDir, "days", fmt.Sprintf("%d-%d", day, part))
+	mainGoPath := filepath.Join(dayDir, "main.go")
+
+	// Check if main.go already exists
+	if _, err := os.Stat(mainGoPath); err == nil {
+		// File exists, skip creation
+		return nil
+	} else if !os.IsNotExist(err) {
+		return fmt.Errorf("check main.go existence: %w", err)
+	}
+
+	// Create directory structure
+	if err := os.MkdirAll(dayDir, 0o755); err != nil {
+		return fmt.Errorf("create day directory %s: %w", dayDir, err)
+	}
+
+	// Generate template content
+	templateContent, err := generateMainGoTemplate(day, part)
+	if err != nil {
+		return err
+	}
+
+	// Write main.go file
+	if err := os.WriteFile(mainGoPath, []byte(templateContent), 0o644); err != nil {
+		return fmt.Errorf("write main.go template: %w", err)
+	}
+
+	if debug {
+		fmt.Printf("Created template: %s\n", mainGoPath)
+	}
+
+	return nil
+}
+
+func generateMainGoTemplate(day, part int) (string, error) {
+	tmplContent, err := templateFS.ReadFile("template.go.tmpl")
+	if err != nil {
+		return "", fmt.Errorf("read template file: %w", err)
+	}
+
+	tmpl, err := template.New("main.go").Parse(string(tmplContent))
+	if err != nil {
+		return "", fmt.Errorf("parse template: %w", err)
+	}
+
+	data := TemplateData{
+		Day:  day,
+		Part: part,
+	}
+
+	var buf bytes.Buffer
+	if err := tmpl.Execute(&buf, data); err != nil {
+		return "", fmt.Errorf("execute template: %w", err)
+	}
+
+	return buf.String(), nil
 }
 
 func parseSelection(value string, min, max int) ([]int, error) {
