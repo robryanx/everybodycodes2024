@@ -17,12 +17,13 @@ var expectations = map[string]string{
 	"2-1": "[220380,826546]",
 	"2-2": "1316",
 	"2-3": "129213",
+	"3-1": "2704",
+	"3-2": "250",
+	"3-3": "3672",
 }
 
 func TestDays2025(t *testing.T) {
 	for day, expect := range expectations {
-		day := day
-		expect := expect
 		t.Run(day, func(t *testing.T) {
 			t.Parallel()
 			runCmd := exec.Command("go", "run", ".")

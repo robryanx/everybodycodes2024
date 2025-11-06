@@ -44,8 +44,6 @@ var expectations = map[string]string{
 
 func TestDays2024(t *testing.T) {
 	for day, expect := range expectations {
-		day := day
-		expect := expect
 		t.Run(day, func(t *testing.T) {
 			t.Parallel()
 			runCmd := exec.Command("go", "run", fmt.Sprintf("days/%s/main.go", day))
