@@ -23,8 +23,8 @@ func main() {
 
 	nodeLookup := make(map[int]*node, len(grid)*len(grid[0]))
 
-	for y := 1; y < len(grid)-1; y++ {
-		for x := 1; x < len(grid[0])-1; x++ {
+	for y := 0; y < len(grid); y++ {
+		for x := 0; x < len(grid[0]); x++ {
 			if grid[y][x] != '#' {
 				n := &node{y, x, height(grid[y][x]), 0, false}
 				switch grid[y][x] {
@@ -36,32 +36,21 @@ func main() {
 		}
 	}
 
-	best := math.MaxInt
+	_ = pathFind(grid, nodeLookup, end, nil)
 
+	best := math.MaxInt
 	for _, y := range []int{0, len(grid) - 1} {
 		for x := 1; x < len(grid[0])-1; x++ {
-			for _, n := range nodeLookup {
-				n.visited = false
-			}
-
-			start := &node{y, x, 0, 0, false}
-			length := pathFind(grid, nodeLookup, start, end)
-			if length < best && length != -1 {
-				best = length
+			if nodeLookup[y*1000+x].distance < best {
+				best = nodeLookup[y*1000+x].distance
 			}
 		}
 	}
 
 	for _, x := range []int{0, len(grid[0]) - 1} {
 		for y := 1; y < len(grid)-1; y++ {
-			for _, n := range nodeLookup {
-				n.visited = false
-			}
-
-			start := &node{y, x, 0, 0, false}
-			length := pathFind(grid, nodeLookup, start, end)
-			if length < best && length != -1 {
-				best = length
+			if nodeLookup[y*1000+x].distance < best {
+				best = nodeLookup[y*1000+x].distance
 			}
 		}
 	}
@@ -113,6 +102,13 @@ type node struct {
 	visited  bool
 }
 
+var offsets = [][2]int{
+	{-1, 0},
+	{1, 0},
+	{0, -1},
+	{0, 1},
+}
+
 func pathFind(grid [][]byte, nodeLookup map[int]*node, start, end *node) int {
 	priorityQueue := []*node{start}
 
@@ -127,43 +123,19 @@ func pathFind(grid [][]byte, nodeLookup map[int]*node, start, end *node) int {
 
 		priorityQueue = priorityQueue[1:]
 
-		if curr.x-1 >= 0 {
-			next, ok := nodeLookup[curr.y*1000+curr.x-1]
-			if ok && !next.visited {
-				dist := curr.distance + distance(curr.height, next.height)
-				if dist < next.distance || next.distance == 0 {
-					next.distance = dist
-					priorityQueue = append(priorityQueue, next)
-				}
-			}
-		}
-		if curr.y-1 >= 0 {
-			next, ok := nodeLookup[(curr.y-1)*1000+curr.x]
-			if ok && !next.visited {
-				dist := curr.distance + distance(curr.height, next.height)
-				if dist < next.distance || next.distance == 0 {
-					next.distance = dist
-					priorityQueue = append(priorityQueue, next)
-				}
-			}
-		}
-		if curr.y+1 < len(grid) {
-			next, ok := nodeLookup[(curr.y+1)*1000+curr.x]
-			if ok && !next.visited {
-				dist := curr.distance + distance(curr.height, next.height)
-				if dist < next.distance || next.distance == 0 {
-					next.distance = curr.distance + distance(curr.height, next.height)
-					priorityQueue = append(priorityQueue, next)
-				}
-			}
-		}
-		if curr.x+1 < len(grid[0]) {
-			next, ok := nodeLookup[curr.y*1000+curr.x+1]
-			if ok && !next.visited {
-				dist := curr.distance + distance(curr.height, next.height)
-				if dist < next.distance || next.distance == 0 {
-					next.distance = curr.distance + distance(curr.height, next.height)
-					priorityQueue = append(priorityQueue, next)
+		for _, offset := range offsets {
+			if curr.x+offset[1] >= 0 &&
+				curr.x+offset[1] < len(grid[0]) &&
+				curr.y+offset[0] >= 0 &&
+				curr.y+offset[0] < len(grid) {
+
+				next, ok := nodeLookup[(curr.y+offset[0])*1000+curr.x+offset[1]]
+				if ok && !next.visited {
+					dist := curr.distance + distance(curr.height, next.height)
+					if dist < next.distance || next.distance == 0 {
+						next.distance = dist
+						priorityQueue = append(priorityQueue, next)
+					}
 				}
 			}
 		}
