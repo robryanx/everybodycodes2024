@@ -58,33 +58,44 @@ func main() {
 		}
 
 		if valid {
+			memo := make(map[int]int, 2048)
 			start := word[len(word)-1]
 
-			paths(start, rules, []byte(word), longestWord, skipWords, &total)
+			p := pathsMemo(start, rules, memo, []byte(word), longestWord, skipWords)
+			total += p
 		}
 	}
 
 	fmt.Println(total)
 }
 
-func paths(curr byte, rules map[byte][]byte, word []byte, longestWord int, skipWords map[string]struct{}, total *int) {
+func pathsMemo(curr byte, rules map[byte][]byte, memo map[int]int, word []byte, longestWord int, skipWords map[string]struct{}) int {
 	if len(word) <= longestWord {
 		delete(skipWords, string(word))
 	}
 
 	if len(word) == 11 {
-		*total++
-		return
+		return 1
 	}
 
+	count := 0
 	if letters, ok := rules[curr]; ok {
 		for _, letter := range letters {
-			newWord := append(word, letter)
-			paths(letter, rules, newWord, longestWord, skipWords, total)
+			key := int(letter)*100 + len(word) + 1
+			if p, mOk := memo[key]; mOk {
+				count += p
+			} else {
+				newWord := append(word, letter)
+				p = pathsMemo(letter, rules, memo, newWord, longestWord, skipWords)
+				memo[key] = p
+				count += p
+			}
 		}
 	}
 
 	if len(word) >= 7 {
-		*total++
+		count++
 	}
+
+	return count
 }
