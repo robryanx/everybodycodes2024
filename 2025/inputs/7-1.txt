@@ -1,0 +1,15 @@
+Nyox,Nygyth,Xilgyth,Lirdravor,Xildravor,Lirox,Nydravor,Xilox,Lirgyth
+
+a > v
+N > y
+i > b
+r > a,o,g,d
+v > o
+t > h
+y > d,b,t
+d > r
+l > o,g,d
+o > r,x
+g > y
+L > i
+X > i

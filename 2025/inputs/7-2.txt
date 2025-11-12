@@ -1,0 +1,29 @@
+Qaltor,Shaelkryth,Qalaris,Harzor,Qalkryth,Shaelnoris,Harpyxis,Draithkryth,Shaelxeth,Shaelath,Zyrixaris,Agnarnoris,Draithasis,Morxeth,Morpyxis,Cynvarasis,Zyrixath,Hareldrin,Qaleldrin,Cynvartor,Paldnoris,Qalpyxis,Draithnoris,Zyrixzor,Qalaris,Harasis,Morasis,Zyrixasis,Draithpyxis,Zyrixtor,Cynvarzor,Agnarkryth,Qalxeth,Draitharis,Draithath,Qalath,Hartor,Shaelasis,Agnarxeth,Agnarath,Paldkryth,Paldpyxis,Qalzor,Cynvarath,Qalasis,Cynvarxeth,Harath,Qaleldrin,Cynvareldrin,Draitheldrin,Shaelzor,Paldzor,Mortor,Zyrixeldrin,Zyrixpyxis,Shaeleldrin,Shaelpyxis,Agnareldrin,Paldaris,Harxeth,Mornoris,Morzor,Qalzor,Paldxeth,Shaeltor,Cynvarpyxis,Qalasis,Paldtor,Qalnoris,Draithtor,Hararis,Qaltor,Draithzor,Paldasis,Qalkryth,Qalpyxis,Moraris,Paldath,Zyrixkryth,Agnarasis,Zyrixxeth,Draithxeth,Morkryth,Zyrixnoris,Harnoris,Moreldrin,Qalnoris,Agnartor,Cynvararis,Paldeldrin,Harkryth,Agnarpyxis,Cynvarnoris,Morath,Cynvarkryth,Shaelaris,Qalxeth,Agnarzor,Agnararis,Qalath
+
+D > r
+P > a
+a > r,s,t,i,v,e
+h > a,z,e,k,x,n,p,t,v
+s > i
+k > r
+v > a
+S > h
+p > y
+l > d,a,z,e,k,x,n,p,t
+e > l,t
+t > h,o
+i > s,x,n,t
+C > y
+Q > a
+o > r,v
+d > r,a,z,e,k,x,n,p,t
+x > i,a,z,e,k,x,n,p,t
+y > x,v,t
+z > o
+n > o,a,v
+g > v
+Z > y
+r > p,i,y,v,a,z,e,k,x,n,t
+A > g
+H > a
+M > o
