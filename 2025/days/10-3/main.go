@@ -86,6 +86,21 @@ func move(t turn, dragon [2]int, sheep [][2]int, maxY, maxX int, hideout map[int
 				nextSheep := slices.Clone(sheep)
 				nextSheep[m[0]] = [2]int{m[1], m[2]}
 
+				// optmisation - if the sheep is moving into a hideout, check if it only has hideouts left to traverse
+				if _, ok := hideout[m[1]*100+m[2]]; ok {
+					allHideouts := true
+					for y := m[1] + 1; y <= maxY; y++ {
+						if _, checkOk := hideout[y*100+m[2]]; !checkOk {
+							allHideouts = false
+							break
+						}
+					}
+
+					if allHideouts {
+						continue
+					}
+				}
+
 				key := serialise(TURN_DRAGON, dragon, nextSheep)
 				count, ok := lookup[key]
 				if !ok {
@@ -136,7 +151,7 @@ func serialise(t turn, dragon [2]int, sheep [][2]int) string {
 	return b.String()
 }
 
-var moves = [][2]int{
+var dragonMoves = [][2]int{
 	{-2, -1},
 	{-2, 1},
 	{-1, -2},
@@ -166,7 +181,7 @@ func validSheepMoves(curr [2]int, sheep [][2]int, hideout map[int]struct{}, maxY
 
 func validDragonMoves(curr [2]int, maxY, maxX int) [][2]int {
 	var valid [][2]int
-	for _, m := range moves {
+	for _, m := range dragonMoves {
 		nextY := curr[0] + m[0]
 		nextX := curr[1] + m[1]
 		if !(nextY < 0 ||
