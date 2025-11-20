@@ -262,7 +262,7 @@ func fetchWithCookie(url, key string) ([]byte, error) {
 	return body, nil
 }
 
-var sampleNoteRE = regexp.MustCompile(`(?is)<pre[^>]*class="[^"]*note[^"]*"[^>]*>(.*?)</pre>`)
+var sampleNoteRE = regexp.MustCompile(`(?is)<pre[^>]*class="note"[^>]*>(.*?)</pre>`)
 
 func extractSampleNote(descriptionHTML string) string {
 	if descriptionHTML == "" {
