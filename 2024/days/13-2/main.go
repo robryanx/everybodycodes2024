@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"slices"
 
 	"github.com/robryanx/everybodycodes/util"
 )
@@ -86,18 +85,18 @@ type node struct {
 }
 
 func pathFind(grid [][]byte, nodeLookup map[int]*node, start, end *node) int {
-	priorityQueue := []*node{start}
+	pq := util.NewPriorityQueue([]*node{start}, func(a, b *node) bool {
+		return a.distance < b.distance
+	})
 
 	for {
-		if len(priorityQueue) == 0 {
+		curr, ok := pq.Pop()
+		if !ok {
 			return -1
 		}
-		curr := priorityQueue[0]
 		if curr == end {
 			return curr.distance
 		}
-
-		priorityQueue = priorityQueue[1:]
 
 		if curr.x-1 >= 0 {
 			next, ok := nodeLookup[curr.y*1000+curr.x-1]
@@ -105,7 +104,7 @@ func pathFind(grid [][]byte, nodeLookup map[int]*node, start, end *node) int {
 				dist := curr.distance + distance(curr.height, next.height)
 				if dist < next.distance || next.distance == 0 {
 					next.distance = dist
-					priorityQueue = append(priorityQueue, next)
+					pq.Push(next)
 				}
 			}
 		}
@@ -115,7 +114,7 @@ func pathFind(grid [][]byte, nodeLookup map[int]*node, start, end *node) int {
 				dist := curr.distance + distance(curr.height, next.height)
 				if dist < next.distance || next.distance == 0 {
 					next.distance = dist
-					priorityQueue = append(priorityQueue, next)
+					pq.Push(next)
 				}
 			}
 		}
@@ -125,7 +124,7 @@ func pathFind(grid [][]byte, nodeLookup map[int]*node, start, end *node) int {
 				dist := curr.distance + distance(curr.height, next.height)
 				if dist < next.distance || next.distance == 0 {
 					next.distance = curr.distance + distance(curr.height, next.height)
-					priorityQueue = append(priorityQueue, next)
+					pq.Push(next)
 				}
 			}
 		}
@@ -135,15 +134,11 @@ func pathFind(grid [][]byte, nodeLookup map[int]*node, start, end *node) int {
 				dist := curr.distance + distance(curr.height, next.height)
 				if dist < next.distance || next.distance == 0 {
 					next.distance = curr.distance + distance(curr.height, next.height)
-					priorityQueue = append(priorityQueue, next)
+					pq.Push(next)
 				}
 			}
 		}
 
 		curr.visited = true
-
-		slices.SortFunc(priorityQueue, func(nodeA, nodeB *node) int {
-			return nodeA.distance - nodeB.distance
-		})
 	}
 }
