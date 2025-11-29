@@ -100,7 +100,7 @@ func processDay(year int, yearDir string, day, seed int, loginKey string, submit
 		return fmt.Errorf("decode quest %d keys: %w", day, err)
 	}
 
-	puzzleURL := fmt.Sprintf("https://everybody-codes.b-cdn.net/assets/%d/%d/input/%d.json", year, day, seed)
+	puzzleURL := fmt.Sprintf("https://everybody.codes/assets/%d/%d/input/%d.json", year, day, seed)
 	body, err = fetchWithCookie(puzzleURL, loginKey)
 	if err != nil {
 		return fmt.Errorf("fetch puzzle %d: %w", day, err)
@@ -111,7 +111,7 @@ func processDay(year int, yearDir string, day, seed int, loginKey string, submit
 		return fmt.Errorf("decode puzzle %d: %w", day, err)
 	}
 
-	descriptionURL := fmt.Sprintf("https://everybody-codes.b-cdn.net/assets/%d/%d/description.json", year, day)
+	descriptionURL := fmt.Sprintf("https://everybody.codes/assets/%d/%d/description.json", year, day)
 	body, err = fetchWithCookie(descriptionURL, loginKey)
 	if err != nil {
 		return fmt.Errorf("fetch description %d: %w", day, err)
